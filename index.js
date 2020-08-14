@@ -1,23 +1,27 @@
-
 const http=require('http');
 const request = require('request');
 const port=3000;
 const hostname='localhost';
 
 let storyArray=[];
+
 request('https://time.com', function (error,response,body) {
 
-    let str = (body.split("<section class=\"homepage-module latest\" data-module_name=\"Latest Stories\">")[1]).split("<h1 class=\"module-title decoration-arrow\">Latest Stories</h1>")[1].split("<ol class=\"swipe-h\">")[1].split("</ol>")[0];
-    let str1=str.split("<li>");
+let index1=body.indexOf('<h1 class="module-title decoration-arrow">Latest Stories</h1>');
+let index2=body.indexOf('</ol>',index1);
+let str=body.slice(index1,index2);
 
-    for(let i=1;i<str1.length;i++){
-        let str2=str1[i];
-        let str3=(str2.split("<article class=\"slide\">")[1]).split("<div class=\"content\">")[1].split("<p class=\"no-eyebrow\"></p>")[1]
-        let link="https://time.com"+(str3.split("<h2 class=\"title\"><a href=")[1]).split("/>")[0];
-        let title=(str3.split("/>")[1]).split("</a></h2>")[0];
+    for(let i=1;i<=5;i++){
+        let index3=str.indexOf('href=');
+        let index4=str.indexOf('/>',index3);
+        
+        let link="https://time.com"+str.slice(index3+5,index4);
+        let index5=str.indexOf('</a></h2>',index4);
+        let title=str.slice(index4+2,index5);
+        str=str.slice(index5);
         storyArray.push({"title":title,"link":link});
 
-    }          
+    }        
 });
 
 const server=http.createServer((req,res)=>{
